@@ -8,3 +8,5 @@ __pycache__/
 ## Ignore pdf files
 /pdfs
 
+## Ignore db files
+/chroma_langchain_db
