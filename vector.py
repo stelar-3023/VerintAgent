@@ -65,4 +65,4 @@ def get_retriever():
     # Add documents
     vectorstore.add_documents(split_docs)
 
-    return vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
+    return vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 20})
