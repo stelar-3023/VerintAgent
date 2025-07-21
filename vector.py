@@ -13,17 +13,30 @@ def get_retriever():
                  for f in os.listdir(pdf_dir) if f.endswith(".pdf")]
     all_documents = []
 
+    # for path in pdf_paths:
+    #     loader = PDFPlumberLoader(path)
+    #     docs = loader.load()
+    #     all_documents.extend(docs)
+
     for path in pdf_paths:
         loader = PDFPlumberLoader(path)
         docs = loader.load()
-        all_documents.extend(docs)
+        for doc in docs:
+              doc.metadata["source"] = os.path.basename(path)  # 🏷️ Add PDF filename
+    all_documents.extend(docs)
 
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=750,
-        chunk_overlap=100,
+        chunk_size=500,
+        chunk_overlap=50,
         separators=["\n\n", "\n", ".", " "]
     )
+
     split_docs = splitter.split_documents(all_documents)
+
+    for chunk in split_docs:
+        if "What the Excel Report Contains" in chunk.page_content:
+            print("\n Found the Excel Report Section in Indexed Content:")
+        print(chunk.page_content[:500])
 
     embedding = OpenAIEmbeddings(api_key=os.getenv("OPENAI_API_KEY"))
 

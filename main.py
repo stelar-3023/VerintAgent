@@ -21,8 +21,10 @@ You are a helpful assistant that strictly answers questions using the provided c
 {answers}
 </context>
 
-Use only the above content. Do not make up any information.
-Question: {question}
+If the answer is not in the context, respond: "The answer is not in the provided documents."
+
+Answer this question:
+{question}
 """)
 
 chain = prompt | model
@@ -41,5 +43,3 @@ if question:
         result = chain.invoke({"answers": answers, "question": question})
         st.markdown("### Answer")
         st.write(result)
-
-
