@@ -5,6 +5,7 @@ langchain-core
 langchain-community
 langchain-openai
 pypdf
+pymupdf
 pdfplumber
 openai
 qdrant-client
