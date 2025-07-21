@@ -27,29 +27,32 @@ def get_retriever(filter_sources=None):
     )
     split_docs = splitter.split_documents(all_documents)
 
-    # Debug: Check for key phrases
-    for doc in split_docs:
-        if "What the Excel Report Contains" in doc.page_content:
-            print("Found Excel section:", doc.page_content[:300])
-
     embedding = OpenAIEmbeddings(api_key=os.getenv("OPENAI_API_KEY"))
 
-    client = QdrantClient(path="qdrant_data")
+    db_path = "qdrant_data"
+    collection_name = "pdf_docs"
+    client = QdrantClient(path=db_path)
 
-    client.recreate_collection(
-        collection_name="pdf_docs",
-        vectors_config={"size": 1536, "distance": Distance.COSINE}
-    )
+    # ✅ Only create/rebuild if collection doesn't exist
+    if collection_name not in [c.name for c in client.get_collections().collections]:
+        client.recreate_collection(
+            collection_name=collection_name,
+            vectors_config={"size": 1536, "distance": Distance.COSINE}
+        )
 
-    vectorstore = Qdrant(
-        client=client,
-        collection_name="pdf_docs",
-        embeddings=embedding
-    )
+        vectorstore = Qdrant(
+            client=client,
+            collection_name=collection_name,
+            embeddings=embedding
+        )
+        vectorstore.add_documents(split_docs)
+    else:
+        vectorstore = Qdrant(
+            client=client,
+            collection_name=collection_name,
+            embeddings=embedding
+        )
 
-    vectorstore.add_documents(split_docs)
-
-    #  Optional filtering by source (PDF filename)
     retriever_filter = None
     if filter_sources:
         retriever_filter = Filter(
