@@ -29,7 +29,7 @@ def get_retriever(filter_sources=None, keywords=None):
             kw.lower() in doc.page_content.lower() for kw in keywords)]
 
     embedding = OpenAIEmbeddings(api_key=os.getenv("OPENAI_API_KEY"))
-    client = QdrantClient(path="qdrant_data")
+    client = QdrantClient(path="localhost", port=6333)
     collection_name = "pdf_docs"
 
     # Always reindex during dev
