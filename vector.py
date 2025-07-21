@@ -3,7 +3,9 @@ def get_retriever():
     from langchain_community.document_loaders import PDFPlumberLoader
     from langchain_text_splitters import RecursiveCharacterTextSplitter
     from langchain_openai import OpenAIEmbeddings
-    from langchain_chroma import Chroma
+    from langchain.vectorstores import Qdrant
+    from qdrant_client import QdrantClient
+    from qdrant_client.models import Distance
 
     pdf_dir = "./pdfs"
     pdf_paths = [os.path.join(pdf_dir, f)
@@ -24,10 +26,23 @@ def get_retriever():
 
     embedding = OpenAIEmbeddings(api_key=os.getenv("OPENAI_API_KEY"))
 
-    # ✅ Fully in-memory Chroma - avoids SQLite completely
-    vectorstore = Chroma.from_documents(
-        documents=split_docs,
-        embedding=embedding
+    # Persistent local Qdrant instance (no SQLite used)
+    client = QdrantClient(path="qdrant_data")
+
+    # Ensure collection exists
+    client.recreate_collection(
+        collection_name="pdf_docs",
+        vectors_config={"size": 1536, "distance": Distance.COSINE}
     )
+
+    # Create vector store
+    vectorstore = Qdrant(
+        client=client,
+        collection_name="pdf_docs",
+        embeddings=embedding
+    )
+
+    # Add documents
+    vectorstore.add_documents(split_docs)
 
     return vectorstore.as_retriever(search_type="mmr", search_kwargs={"k": 10})

@@ -1,9 +1,10 @@
+# requirements.txt
 streamlit
 langchain
 langchain-core
 langchain-community
 langchain-openai
-langchain-chroma
 pypdf
 pdfplumber
 openai
+qdrant-client
