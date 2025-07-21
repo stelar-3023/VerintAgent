@@ -1,5 +1,5 @@
 import streamlit as st
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from vector import get_retriever, get_available_sources
 
@@ -57,7 +57,7 @@ if question:
             st.markdown(
                 f"**Chunk {i+1} — `{doc.metadata.get('source', 'unknown')}`**")
             st.text(doc.page_content[:700])
-            
+
 
         context_text = "\n\n".join([doc.page_content for doc in answers])
         result = chain.invoke({"answers": answers, "question": question})
