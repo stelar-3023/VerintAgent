@@ -1,4 +1,4 @@
-def get_retriever(filter_sources=None):
+def get_retriever(filter_sources=None, keywords=None):
     import os
     from langchain_community.document_loaders import PyMuPDFLoader as PDFLoader
     from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -13,9 +13,15 @@ def get_retriever(filter_sources=None):
                  for f in os.listdir(pdf_dir) if f.endswith(".pdf")]
     all_documents = []
 
+    # Apply keyword filtering if keywords were passed
     for path in pdf_paths:
         loader = PDFLoader(path)
         docs = loader.load()
+
+        if keywords:
+            docs = [doc for doc in docs if any(
+                kw.lower() in doc.page_content.lower() for kw in keywords)]
+
         for doc in docs:
             doc.metadata["source"] = os.path.basename(path)
         all_documents.extend(docs)
@@ -28,31 +34,23 @@ def get_retriever(filter_sources=None):
     split_docs = splitter.split_documents(all_documents)
 
     embedding = OpenAIEmbeddings(api_key=os.getenv("OPENAI_API_KEY"))
-
     db_path = "qdrant_data"
     collection_name = "pdf_docs"
     client = QdrantClient(path=db_path)
 
-    #  Only create/rebuild if collection doesn't exist
     if collection_name not in [c.name for c in client.get_collections().collections]:
         client.recreate_collection(
             collection_name=collection_name,
             vectors_config={"size": 1536, "distance": Distance.COSINE}
         )
-
         vectorstore = Qdrant(
-            client=client,
-            collection_name=collection_name,
-            embeddings=embedding
-        )
+            client=client, collection_name=collection_name, embeddings=embedding)
         vectorstore.add_documents(split_docs)
     else:
         vectorstore = Qdrant(
-            client=client,
-            collection_name=collection_name,
-            embeddings=embedding
-        )
+            client=client, collection_name=collection_name, embeddings=embedding)
 
+    # Filter by PDF filename (source)
     retriever_filter = None
     if filter_sources:
         retriever_filter = Filter(
@@ -66,8 +64,6 @@ def get_retriever(filter_sources=None):
         search_type="mmr",
         search_kwargs={"k": 20, "filter": retriever_filter}
     )
-
-#  List all available sources for sidebar
 
 
 def get_available_sources():
