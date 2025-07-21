@@ -24,11 +24,10 @@ def get_retriever():
 
     embedding = OpenAIEmbeddings(api_key=os.getenv("OPENAI_API_KEY"))
 
-    vectorstore = Chroma(
-        collection_name="pdf_docs",
-        embedding_function=embedding
+    # ✅ Fully in-memory Chroma - avoids SQLite completely
+    vectorstore = Chroma.from_documents(
+        documents=split_docs,
+        embedding=embedding
     )
-
-    vectorstore.add_documents(split_docs)
 
     return vectorstore.as_retriever(search_type="mmr", search_kwargs={"k": 10})
