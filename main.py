@@ -14,8 +14,8 @@ selected_sources = st.sidebar.multiselect(
 
 # Keyword filter input
 custom_keywords = st.sidebar.text_input(
-    "🔎 Only index chunks containing these keywords (comma-separated):",
-    value="FTE Differential, threshold"
+    "Only index chunks containing these keywords (comma-separated):",
+    value=""
 )
 keyword_list = [kw.strip() for kw in custom_keywords.split(",") if kw.strip()]
 
