@@ -8,6 +8,7 @@ def get_retriever():
     from qdrant_client.models import Distance
 
     pdf_dir = "./pdfs"
+    os.makedirs(pdf_dir, exist_ok=True)
     pdf_paths = [os.path.join(pdf_dir, f)
                  for f in os.listdir(pdf_dir) if f.endswith(".pdf")]
     all_documents = []
