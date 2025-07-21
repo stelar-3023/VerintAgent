@@ -10,3 +10,6 @@ __pycache__/
 
 ## Ignore db files
 /chroma_langchain_db
+
+## Ignore streamlit secrets
+/.streamlit

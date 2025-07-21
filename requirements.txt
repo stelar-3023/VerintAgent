@@ -1,8 +1,9 @@
 streamlit
 langchain
-langchain-community
 langchain-core
+langchain-community
+langchain-openai
 langchain-chroma
-langchain-ollama
 pypdf
-pandas
+pdfplumber
+openai

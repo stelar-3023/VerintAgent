@@ -1,10 +1,11 @@
-def get_retriever():
-    import os
-    from langchain_community.document_loaders import PDFPlumberLoader
-    from langchain_text_splitters import RecursiveCharacterTextSplitter
-    from langchain_ollama import OllamaEmbeddings
-    from langchain_chroma import Chroma
+import os
+from langchain_community.document_loaders import PDFPlumberLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_ollama import OllamaEmbeddings
+from langchain_chroma import Chroma
 
+
+def get_retriever():
     pdf_dir = "./pdfs"
     pdf_paths = [os.path.join(pdf_dir, f)
                  for f in os.listdir(pdf_dir) if f.endswith(".pdf")]
