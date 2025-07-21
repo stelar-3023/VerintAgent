@@ -9,7 +9,7 @@ st.title("📄 Ask Questions About Your PDFs")
 retriever = get_retriever()
 
 model = ChatOpenAI(
-    model_name="gpt-3.5-turbo",  # or gpt-4
+    model_name="gpt-3.5-turbo",
     temperature=0,
     api_key=st.secrets["OPENAI_API_KEY"]
 )
@@ -36,11 +36,12 @@ if question:
     with st.spinner("Searching and generating answer..."):
         answers = retriever.invoke(question)
 
-        st.markdown("### Retrieved Context")
+        st.markdown("### 🔍 Retrieved Context")
         for doc in answers:
             source = doc.metadata.get("source", "unknown")
             st.markdown(f"**From:** `{source}`")
-            st.markdown(f"> {doc.page_content[:500]}...")
+            # Show snippet of retrieved context
+            st.text(doc.page_content[:500])
 
         result = chain.invoke({"answers": answers, "question": question})
         st.markdown("### Answer")
