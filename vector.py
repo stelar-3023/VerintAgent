@@ -23,7 +23,7 @@ def get_retriever():
         docs = loader.load()
         for doc in docs:
               doc.metadata["source"] = os.path.basename(path)  # 🏷️ Add PDF filename
-    all_documents.extend(docs)
+        all_documents.extend(docs)
 
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
