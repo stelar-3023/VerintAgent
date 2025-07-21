@@ -68,5 +68,6 @@ def get_retriever(filter_sources=None):
 
 
 def get_available_sources():
+    import os
     pdf_dir = "./pdfs"
     return [f for f in os.listdir(pdf_dir) if f.endswith(".pdf")]
