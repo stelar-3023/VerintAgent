@@ -13,48 +13,38 @@ def get_retriever(filter_sources=None, keywords=None):
                  for f in os.listdir(pdf_dir) if f.endswith(".pdf")]
     all_documents = []
 
-    # Apply keyword filtering if keywords were passed
     for path in pdf_paths:
         loader = PDFLoader(path)
         docs = loader.load()
-
-        if keywords:
-            docs = [doc for doc in docs if any(
-                kw.lower() in doc.page_content.lower() for kw in keywords)]
-
         for doc in docs:
             doc.metadata["source"] = os.path.basename(path)
         all_documents.extend(docs)
 
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1200,
-        chunk_overlap=200,
-        separators=["\n\n", "\n", ".", " "]
-    )
+        chunk_size=1200, chunk_overlap=200)
     split_docs = splitter.split_documents(all_documents)
 
+    if keywords:
+        split_docs = [doc for doc in split_docs if any(
+            kw.lower() in doc.page_content.lower() for kw in keywords)]
+
     embedding = OpenAIEmbeddings(api_key=os.getenv("OPENAI_API_KEY"))
-    db_path = "qdrant_data"
+    client = QdrantClient(path="qdrant_data")
     collection_name = "pdf_docs"
-    client = QdrantClient(path=db_path)
 
-    if collection_name not in [c.name for c in client.get_collections().collections]:
-        client.recreate_collection(
-            collection_name=collection_name,
-            vectors_config={"size": 1536, "distance": Distance.COSINE}
-        )
-        vectorstore = Qdrant(
-            client=client, collection_name=collection_name, embeddings=embedding)
-        vectorstore.add_documents(split_docs)
-    else:
-        vectorstore = Qdrant(
-            client=client, collection_name=collection_name, embeddings=embedding)
+    # Always reindex during dev
+    client.recreate_collection(
+        collection_name=collection_name,
+        vectors_config={"size": 1536, "distance": Distance.COSINE}
+    )
+    vectorstore = Qdrant(
+        client=client, collection_name=collection_name, embeddings=embedding)
+    vectorstore.add_documents(split_docs)
 
-    # Filter by PDF filename (source)
     retriever_filter = None
     if filter_sources:
         retriever_filter = Filter(
-            must=[
+            should=[
                 FieldCondition(key="source", match=MatchValue(value=source))
                 for source in filter_sources
             ]

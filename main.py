@@ -57,7 +57,9 @@ if question:
             st.markdown(
                 f"**Chunk {i+1} — `{doc.metadata.get('source', 'unknown')}`**")
             st.text(doc.page_content[:700])
+            
 
+        context_text = "\n\n".join([doc.page_content for doc in answers])
         result = chain.invoke({"answers": answers, "question": question})
         st.markdown("### Answer")
         st.write(result)
