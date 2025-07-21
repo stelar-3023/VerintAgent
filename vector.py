@@ -29,15 +29,14 @@ def get_retriever():
     db_location = "./chroma_langchain_db"
     vectorstore = Chroma(
         collection_name="pdf_docs",
-        persist_directory=db_location,
         embedding_function=embedding
     )
 
-    if not os.path.exists(db_location + "/index.lock"):
-        print("Indexing new documents...")
-        vectorstore.add_documents(split_docs)
-        open(db_location + "/index.lock", "w").close()
-    else:
-        print("Using existing Chroma DB")
+    # if not os.path.exists(db_location + "/index.lock"):
+    #     print("Indexing new documents...")
+    #     vectorstore.add_documents(split_docs)
+    #     open(db_location + "/index.lock", "w").close()
+    # else:
+    #     print("Using existing Chroma DB")
 
     return vectorstore.as_retriever(search_type="mmr", search_kwargs={"k": 10})
