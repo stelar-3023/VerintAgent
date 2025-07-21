@@ -1,6 +1,7 @@
 def get_retriever():
     import os
-    from langchain_community.document_loaders import PDFPlumberLoader
+    from langchain_community.document_loaders import PyMuPDFLoader as PDFLoader
+    # from langchain_community.document_loaders import PDFPlumberLoader
     from langchain_text_splitters import RecursiveCharacterTextSplitter
     from langchain_openai import OpenAIEmbeddings
     from langchain.vectorstores import Qdrant
@@ -19,7 +20,7 @@ def get_retriever():
     #     all_documents.extend(docs)
 
     for path in pdf_paths:
-        loader = PDFPlumberLoader(path)
+        loader = PDFLoader(path)
         docs = loader.load()
         for doc in docs:
               doc.metadata["source"] = os.path.basename(path)  # 🏷️ Add PDF filename
@@ -64,4 +65,4 @@ def get_retriever():
     # Add documents
     vectorstore.add_documents(split_docs)
 
-    return vectorstore.as_retriever(search_type="mmr", search_kwargs={"k": 10})
+    return vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
