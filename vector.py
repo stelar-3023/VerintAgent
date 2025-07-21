@@ -21,8 +21,8 @@ def get_retriever(filter_sources=None):
         all_documents.extend(docs)
 
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=750,
-        chunk_overlap=100,
+        chunk_size=1200,
+        chunk_overlap=200,
         separators=["\n\n", "\n", ".", " "]
     )
     split_docs = splitter.split_documents(all_documents)
@@ -33,7 +33,7 @@ def get_retriever(filter_sources=None):
     collection_name = "pdf_docs"
     client = QdrantClient(path=db_path)
 
-    # ✅ Only create/rebuild if collection doesn't exist
+    #  Only create/rebuild if collection doesn't exist
     if collection_name not in [c.name for c in client.get_collections().collections]:
         client.recreate_collection(
             collection_name=collection_name,
@@ -63,8 +63,8 @@ def get_retriever(filter_sources=None):
         )
 
     return vectorstore.as_retriever(
-        search_type="similarity",
-        search_kwargs={"k": 15, "filter": retriever_filter}
+        search_type="mmr",
+        search_kwargs={"k": 20, "filter": retriever_filter}
     )
 
 #  List all available sources for sidebar
