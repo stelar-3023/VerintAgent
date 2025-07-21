@@ -27,7 +27,8 @@ Question: {question}
 
 chain = prompt | model
 
-question = st.text_input("Ask a question about the documents:", key="question_input")
+question = st.text_input(
+    "Ask a question about the documents:", key="question_input")
 
 if question:
     with st.spinner("Searching and generating answer..."):
@@ -38,7 +39,7 @@ if question:
             st.markdown(f"> {doc.page_content[:500]}...")
 
         result = chain.invoke({"answers": answers, "question": question})
-        st.markdown("### 🤖 Answer")
+        st.markdown("### Answer")
         st.write(result)
 
 
