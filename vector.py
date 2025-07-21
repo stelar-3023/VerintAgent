@@ -33,6 +33,11 @@ def get_retriever():
 
     split_docs = splitter.split_documents(all_documents)
 
+    for doc in split_docs:
+        if "Excel report contains" in doc.page_content or "What the Excel Report Contains" in doc.page_content:
+            print(" Found correct chunk:", doc.page_content[:300])
+
+
     for chunk in split_docs:
         if "What the Excel Report Contains" in chunk.page_content:
             print("\n Found the Excel Report Section in Indexed Content:")

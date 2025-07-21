@@ -36,8 +36,10 @@ if question:
     with st.spinner("Searching and generating answer..."):
         answers = retriever.invoke(question)
 
-        st.markdown("### 🔍 Retrieved Context")
+        st.markdown("### Retrieved Context")
         for doc in answers:
+            source = doc.metadata.get("source", "unknown")
+            st.markdown(f"**From:** `{source}`")
             st.markdown(f"> {doc.page_content[:500]}...")
 
         result = chain.invoke({"answers": answers, "question": question})
