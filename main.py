@@ -4,7 +4,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from vector import get_retriever, get_available_sources
 
 st.set_page_config(page_title="PDF Q&A", layout="wide")
-st.title("📄 Ask Questions About Your PDFs")
+st.title("📄 Ask Questions About Verint")
 
 # Sidebar PDF filter
 available_sources = get_available_sources()
